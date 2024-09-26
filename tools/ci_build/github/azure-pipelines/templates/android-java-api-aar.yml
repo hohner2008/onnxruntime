@@ -45,7 +45,10 @@ jobs:
   timeoutInMinutes: 120
   workspace:
     clean: all
-  pool: ${{parameters.pool_name}}
+  pool:
+    name: ${{parameters.pool_name}}
+    demands:
+      - ImageVersionOverride -equals 9.0.0
 
   variables:
     artifacts_directory: $(Build.BinariesDirectory)/.artifacts
