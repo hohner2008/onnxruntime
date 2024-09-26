@@ -170,6 +170,9 @@ function(setup_mlas_source_for_windows)
       ${mlas_platform_srcs_avx2}
       ${MLAS_SRC_DIR}/qgemm_kernel_amx.cpp
       ${MLAS_SRC_DIR}/qgemm_kernel_avx2.cpp
+      ${MLAS_SRC_DIR}/qsoftmax.cpp
+      ${MLAS_SRC_DIR}/qsoftmax_kernel_avx2.cpp
+      ${MLAS_SRC_DIR}/qsoftmax_kernel_avx512.cpp
       ${MLAS_SRC_DIR}/qgemm_kernel_sse.cpp
       ${MLAS_SRC_DIR}/qgemm_kernel_sse41.cpp
       ${MLAS_SRC_DIR}/intrinsics/avx512/quantize_avx512f.cpp
@@ -616,6 +619,9 @@ endif()
           ${MLAS_SRC_DIR}/dgemm.cpp
           ${MLAS_SRC_DIR}/pooling_fp16.cpp
           ${MLAS_SRC_DIR}/qgemm_kernel_avx2.cpp
+          ${MLAS_SRC_DIR}/qsoftmax.cpp
+          ${MLAS_SRC_DIR}/qsoftmax_kernel_avx2.cpp
+          ${MLAS_SRC_DIR}/qsoftmax_kernel_avx512.cpp
           ${mlas_platform_srcs_sse2}
           ${mlas_platform_srcs_avx}
           ${mlas_platform_srcs_avx2}
@@ -630,6 +636,7 @@ endif()
             ${MLAS_SRC_DIR}/q4gemm_avx512.cpp
           )
           set_source_files_properties(${MLAS_SRC_DIR}/q4gemm_avx512.cpp PROPERTIES COMPILE_FLAGS "-mfma -mavx512vnni -mavx512bw -mavx512dq -mavx512vl -mavx512f")
+          set_source_files_properties(${MLAS_SRC_DIR}/qsoftmax_kernel_avx512.cpp PROPERTIES COMPILE_FLAGS "-mfma -mavx512vnni -mavx512bw -mavx512dq -mavx512vl -mavx512f")
         endif()
         if(NOT APPLE)
           set(mlas_platform_srcs
@@ -640,6 +647,7 @@ endif()
             )
           set_source_files_properties(${MLAS_SRC_DIR}/qgemm_kernel_amx.cpp PROPERTIES COMPILE_FLAGS "-mavx2 -mavx512bw -mavx512dq -mavx512vl -mavx512f")
           set_source_files_properties(${MLAS_SRC_DIR}/x86_64/QgemmU8S8KernelAmx.S PROPERTIES COMPILE_FLAGS "-mavx2 -mavx512bw -mavx512dq -mavx512vl -mavx512f")
+          set_source_files_properties(${MLAS_SRC_DIR}/qsoftmax_kernel_avx2.cpp PROPERTIES COMPILE_FLAGS "-mavx2")
         endif()
 
         if(ONNXRUNTIME_MLAS_MULTI_ARCH)

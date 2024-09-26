@@ -103,4 +103,39 @@ common::Status SoftmaxCPU<float>(size_t N,
   return Status::OK();
 }
 
+template <typename T>
+common::Status QlinearSoftmaxCPU(size_t N,
+                                 size_t D,
+                                 const T* x_data,
+                                 T* y_data,
+                                 const float* lookup_table,
+                                 float y_scale,
+                                 T yzp,
+                                 onnxruntime::concurrency::ThreadPool* thread_pool);
+template <>
+common::Status QlinearSoftmaxCPU<int8_t>(size_t N,
+                                         size_t D,
+                                         const int8_t* x_data,
+                                         int8_t* y_data,
+                                         const float* lookup_table,
+                                         float y_scale,
+                                         int8_t yzp,
+                                         onnxruntime::concurrency::ThreadPool* thread_pool){
+  MlasComputeQSoftmax(x_data, y_data, N, D, lookup_table,y_scale,yzp, true, thread_pool);
+  return Status::OK();
+}
+
+template <>
+common::Status QlinearSoftmaxCPU<uint8_t>(size_t N,
+                                          size_t D,
+                                          const uint8_t* x_data,
+                                          uint8_t* y_data,
+                                          const float* lookup_table,
+                                          float y_scale,
+                                          uint8_t yzp,
+                                          onnxruntime::concurrency::ThreadPool* thread_pool)
+{
+  MlasComputeQSoftmax(x_data, y_data, N, D, lookup_table,y_scale,yzp, false, thread_pool);
+  return Status::OK();
+}
 }  // namespace onnxruntime

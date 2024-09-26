@@ -20,4 +20,13 @@ Calculate Softmax using CPU memory.
 template <typename T>
 common::Status SoftmaxCPU(size_t N, size_t D, const T* Xdata, T* Ydata,
                           bool logarithmic, concurrency::ThreadPool* thread_pool);
+template <typename T>
+common::Status QlinearSoftmaxCPU(size_t N,
+                                 size_t D,
+                                 const T* x_data,
+                                 T* y_data,
+                                 const float* lookup_table,
+                                 float y_scale,
+                                 T yzp,
+                                 onnxruntime::concurrency::ThreadPool* thread_pool);
 }  // namespace onnxruntime

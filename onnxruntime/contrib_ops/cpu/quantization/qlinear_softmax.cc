@@ -12,6 +12,7 @@
 #include "core/framework/tensorprotoutils.h"
 #include "core/providers/common.h"
 #include "core/providers/cpu/tensor/transpose.h"
+#include "core/providers/cpu/math/softmax_shared.h"
 
 #include "core/mlas/inc/mlas.h"
 #include "core/platform/threadpool.h"
@@ -36,7 +37,7 @@ void QlinearBuildLookupTableUint32(gsl::span<QLinearSoftmax::EXP_OUT_DTYPE> tabl
   for (int32_t i = 0; i < 256; i++) {
     double scaled_exp_xi = exp((static_cast<double>(i) - 255 + bit_shift) * static_cast<double>(x_scale));
     // we can't get the real max value of input tensor here, so we just assume 255-bit_shift.
-    // in the function of `QlinearSoftmaxCPU`,
+    // in the function of `QlinearSoftmaxCPUNaive`,
     // all numbers will have a shift (255-bit_shift-max_value) if its max value is not 255
     //
     // if is_signed index = [1 2 3 ......126 127 -128 -127 ..... -3 -2 -1]
@@ -124,7 +125,7 @@ Status QLinearSoftmax::Compute(OpKernelContext* ctx) const {
 }
 
 template <typename T>
-common::Status QlinearSoftmaxCPU(size_t N,
+common::Status QlinearSoftmaxCPUNaive(size_t N,
                                  size_t D,
                                  const T* x_data,
                                  T* y_data,
@@ -134,7 +135,7 @@ common::Status QlinearSoftmaxCPU(size_t N,
                                  onnxruntime::concurrency::ThreadPool* thread_pool);
 
 template <>
-common::Status QlinearSoftmaxCPU<uint8_t>(size_t N,
+common::Status QlinearSoftmaxCPUNaive<uint8_t>(size_t N,
                                           size_t D,
                                           const uint8_t* x_data,
                                           uint8_t* y_data,
@@ -185,7 +186,7 @@ common::Status QlinearSoftmaxCPU<uint8_t>(size_t N,
             const size_t vx = *x_t_cur++;
             const QLinearSoftmax::EXP_OUT_DTYPE vt = shifted_lookuptable[vx];
             // simulate round function, and re-quant to uint8
-            const uint32_t vq = static_cast<uint32_t>(std::nearbyintf(((vt * c_y_scale)) / vsum)) + c_y_zp;
+            const uint32_t vq = static_cast<uint32_t>(std::nearbyintf((vt * c_y_scale) / vsum)) + c_y_zp;
             const uint8_t vy = vq > 255 ? static_cast<uint8_t>(255) : static_cast<uint8_t>(vq);
             *y_t++ = vy;
           } while (--elements_n != 0);
@@ -197,7 +198,7 @@ common::Status QlinearSoftmaxCPU<uint8_t>(size_t N,
 }
 
 template <>
-common::Status QlinearSoftmaxCPU<int8_t>(size_t N,
+common::Status QlinearSoftmaxCPUNaive<int8_t>(size_t N,
                                          size_t D,
                                          const int8_t* x_data,
                                          int8_t* y_data,
@@ -280,11 +281,15 @@ Status QLinearSoftmax::ComputeInternal(OpKernelContext* context, const Tensor& i
   if (is_signed_) {
     using T = int8_t;
     const T Y_zp = Y_zp_tensor ? *(Y_zp_tensor->Data<T>()) : 0;
+    status = QlinearSoftmaxCPUNaive<T>(N, D, input.Data<T>(), output.MutableData<T>(),
+                                  lookup_table.data(), Y_scale, Y_zp, thread_pool);
     status = QlinearSoftmaxCPU<T>(N, D, input.Data<T>(), output.MutableData<T>(),
                                   lookup_table.data(), Y_scale, Y_zp, thread_pool);
   } else {
     using T = uint8_t;
     const T Y_zp = Y_zp_tensor ? *(Y_zp_tensor->Data<T>()) : 0;
+    // status = QlinearSoftmaxCPUNaive<T>(N, D, input.Data<T>(), output.MutableData<T>(),
+    //                               lookup_table.data(), Y_scale, Y_zp, thread_pool);
     status = QlinearSoftmaxCPU<T>(N, D, input.Data<T>(), output.MutableData<T>(),
                                   lookup_table.data(), Y_scale, Y_zp, thread_pool);
   }
