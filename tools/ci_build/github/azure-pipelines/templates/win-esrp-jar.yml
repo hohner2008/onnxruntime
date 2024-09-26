@@ -1,34 +1,24 @@
 parameters:
+- name: DoEsrp
+  type: boolean
+  default: true
+
+- name: FolderPath
+  type: string
+  default: ''
+
+- name: DisplayName
+  type: string
+  default: ''
+
 - name: Pattern
   type: string
-  default: '*.dll'
+  default: '*.jar'
 
 steps:
-- task: PowerShell@2
-  displayName: 'KYLE - Generate Test Files'
-  inputs:
-    targetType: 'inline'
-    workingDirectory: '$(Build.BinariesDirectory)'
-    script: |
-      $working_directory='$(Build.BinariesDirectory)\kyle'
-
-      #$working_directory="D:\Features\EngineeringSystem\Task DLLs in maven" + "\kyle"
-
-      New-Item -Path $working_directory -ItemType Directory
-
-      Write-Host "Generating fake jar files."
-      Out-File -FilePath $working_directory"\test1.jar" -InputObject "this is a test1 jar file."
-      Write-Host "Generated fake jar files."
-
-      <#
-      Write-Host "Generating fake dll files."
-      Out-File -FilePath $working_directory"\test2.dll" -InputObject "this is a test2 dll file."
-      Write-Host "Generated fake dll files."
-      #>
-
-
 - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@5
-  displayName: "KYLE - ESRP Basic Usage"
+  displayName: ${{ parameters.DisplayName }}
+  condition: and(succeeded(), eq('${{ parameters.DoEsrp }}', true))
   inputs:
     ConnectedServiceName: 'OnnxrunTimeCodeSign_20240611'
     AppRegistrationClientId: '53d54d02-978d-4305-8572-583cf6711c4f'
@@ -69,22 +59,8 @@ steps:
         }
       ]
 
-    FolderPath: '$(Build.BinariesDirectory)\kyle'
+    FolderPath: ${{ parameters.FolderPath }}
     Pattern: ${{ parameters.Pattern }}
     SessionTimeout: 90
     ServiceEndpointUrl: 'https://api.esrp.microsoft.com/api/v2'
     MaxConcurrency: 25
-
-- task: PublishPipelineArtifact@1
-  displayName: 'KYLE - Publish Artifacts'
-  inputs:
-    targetPath: '$(Build.BinariesDirectory)\kyle'
-    artifactName: 'debug_artifacts'
-
-- task: PowerShell@2
-  displayName: 'KYLE - Ending Pipeline Running'
-  inputs:
-    targetType: 'inline'
-    workingDirectory: '$(Build.BinariesDirectory)'
-    script: |
-      exit 1

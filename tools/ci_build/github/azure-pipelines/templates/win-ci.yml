@@ -110,8 +110,6 @@ stages:
       timeoutInMinutes: 360
 
     steps:
-      - template: 0-kyle-explore-esrp.yml
-
       - task: mspremier.PostBuildCleanup.PostBuildCleanup-task.PostBuildCleanup@3
         displayName: 'Clean Agent Directories'
         condition: always()
