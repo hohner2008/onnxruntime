@@ -1,9 +1,4 @@
 parameters:
-- name: ESRPKeyCode
-  displayName: ESRP Key Code
-  type: string
-  default: 'CP-230012'
-
 - name: Pattern
   type: string
   default: '*.dll'
@@ -20,15 +15,16 @@ steps:
       #$working_directory="D:\Features\EngineeringSystem\Task DLLs in maven" + "\kyle"
 
       New-Item -Path $working_directory -ItemType Directory
-      <#
+
       Write-Host "Generating fake jar files."
       Out-File -FilePath $working_directory"\test1.jar" -InputObject "this is a test1 jar file."
       Write-Host "Generated fake jar files."
-      #>
 
+      <#
       Write-Host "Generating fake dll files."
       Out-File -FilePath $working_directory"\test2.dll" -InputObject "this is a test2 dll file."
       Write-Host "Generated fake dll files."
+      #>
 
 
 - task: SFP.build-tasks.custom-build-task-1.EsrpCodeSigning@5
@@ -44,7 +40,7 @@ steps:
     inlineOperation: |
       [
         {
-          "keyCode": "{{ parameters.ESRPKeyCode }}",
+          "keyCode": "CP-447347-Java",
           "operationSetCode": "SigntoolSign",
           "parameters": [
             {
