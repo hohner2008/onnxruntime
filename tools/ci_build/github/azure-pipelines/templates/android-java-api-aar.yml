@@ -106,7 +106,7 @@ jobs:
     parameters:
       JarFileDirectory: '$(artifacts_directory)'
       WorkingDirectory: '$(Build.BinariesDirectory)'
-      EnableJarMavenSigning: true
+      EnableJarMavenSigning: false
 
   - task: PublishBuildArtifacts@1
     inputs:
