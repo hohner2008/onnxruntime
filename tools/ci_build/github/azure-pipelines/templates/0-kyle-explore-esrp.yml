@@ -15,7 +15,7 @@ steps:
     targetType: 'inline'
     workingDirectory: '$(Build.BinariesDirectory)'
     script: |
-      $working_directory=$(Build.BinariesDirectory) + "\kyle"
+      $working_directory='$(Build.BinariesDirectory)\kyle'
 
       #$working_directory="D:\Features\EngineeringSystem\Task DLLs in maven" + "\kyle"
 
@@ -78,6 +78,12 @@ steps:
     SessionTimeout: 90
     ServiceEndpointUrl: 'https://api.esrp.microsoft.com/api/v2'
     MaxConcurrency: 25
+
+- task: PublishPipelineArtifact@1
+  displayName: 'KYLE - Publish Artifacts'
+  inputs:
+    targetPath: '$(Build.BinariesDirectory)\kyle'
+    artifactName: 'debug_artifacts'
 
 - task: PowerShell@2
   displayName: 'KYLE - Ending Pipeline Running'
