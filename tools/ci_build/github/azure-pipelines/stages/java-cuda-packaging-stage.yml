@@ -5,6 +5,10 @@ parameters:
   type: string
 - name: BuildId
   type: string
+- name: DoEsrp
+  displayName: Run code sign tasks? Must be true if you are doing an Onnx Runtime release.
+  type: boolean
+  default: false
 
 stages:
 - stage: Jar_Packaging_GPU
