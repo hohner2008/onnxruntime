@@ -149,6 +149,7 @@ Status LayerNorm<simplified>::ComputeInternal(onnxruntime::webgpu::ComputeContex
   return context.RunProgram(program);
 }
 
+
 ONNX_OPERATOR_KERNEL_EX(
     LayerNormalization,
     kOnnxDomain,
@@ -157,6 +158,14 @@ ONNX_OPERATOR_KERNEL_EX(
     (*KernelDefBuilder::Create())
       .TypeConstraint("T", WebGpuSupportedFloatTypes()),
     LayerNorm<false>);
+
+ONNX_OPERATOR_KERNEL_EX(
+    SimplifiedLayerNormalization,
+    kOnnxDomain,
+    1,
+    kWebGpuExecutionProvider,
+    (*KernelDefBuilder::Create()).TypeConstraint("T", WebGpuSupportedFloatTypes()),
+    LayerNorm<true>);
 
 }  // namespace webgpu
 }  // namespace onnxruntime

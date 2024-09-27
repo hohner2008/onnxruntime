@@ -12,6 +12,7 @@ namespace contrib {
 namespace webgpu {
 
 using namespace onnxruntime::webgpu;
+using onnxruntime::webgpu::ComputeContext;
 
 ONNX_OPERATOR_VERSIONED_KERNEL_EX(
     LayerNormalization,
@@ -20,7 +21,7 @@ ONNX_OPERATOR_VERSIONED_KERNEL_EX(
     16,
     kWebGpuExecutionProvider,
     (*KernelDefBuilder::Create()).TypeConstraint("T", WebGpuSupportedFloatTypes()),
-    LayerNorm<false>);
+    onnxruntime::webgpu::LayerNorm<false>);
 
 ONNX_OPERATOR_KERNEL_EX(
     SimplifiedLayerNormalization,
@@ -28,7 +29,7 @@ ONNX_OPERATOR_KERNEL_EX(
     1,
     kWebGpuExecutionProvider,
     (*KernelDefBuilder::Create()).TypeConstraint("T", WebGpuSupportedFloatTypes()),
-    LayerNorm<true>);
+    onnxruntime::webgpu::LayerNorm<true>);
 
 }  // namespace webgpu
 }  // namespace contrib
