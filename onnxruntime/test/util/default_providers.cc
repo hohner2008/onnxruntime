@@ -302,6 +302,19 @@ std::unique_ptr<IExecutionProvider> DefaultXnnpackExecutionProvider() {
 #endif
 }
 
+std::unique_ptr<IExecutionProvider> DefaultWebGpuExecutionProvider() {
+#ifdef USE_WEBGPU
+  ConfigOptions config_options{};
+  // Disable storage buffer cache
+  ORT_ENFORCE(config_options.AddConfigEntry(webgpu::options::kStorageBufferCacheMode,
+                                            webgpu::options::kBufferCacheMode_Disabled)
+                  .IsOK());
+  return WebGpuProviderFactoryCreator::Create(config_options)->CreateProvider();
+#else
+  return nullptr;
+#endif
+}
+
 std::unique_ptr<IExecutionProvider> DefaultCannExecutionProvider() {
 #ifdef USE_CANN
   OrtCANNProviderOptions provider_options{};
