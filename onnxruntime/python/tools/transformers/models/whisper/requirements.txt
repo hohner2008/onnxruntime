@@ -12,3 +12,4 @@ protobuf==3.20.2
 numpy==1.23.3
 psutil
 py3nvml
+aiohttp>=3.10.11 # not directly required, pinned by Snyk to avoid a vulnerability
