@@ -2,3 +2,4 @@ onnxconverter-common
 onnxmltools
 pandas
 coloredlogs
+onnx>=1.17.0 # not directly required, pinned by Snyk to avoid a vulnerability
