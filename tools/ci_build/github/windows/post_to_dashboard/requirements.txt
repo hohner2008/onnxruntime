@@ -1,2 +1,4 @@
 azure-kusto-data[pandas]==4.5.1
 azure-kusto-ingest[pandas]==4.5.1
+azure-core>=1.38.0 # not directly required, pinned by Snyk to avoid a vulnerability
+urllib3>=2.6.3 # not directly required, pinned by Snyk to avoid a vulnerability
