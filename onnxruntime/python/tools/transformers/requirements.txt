@@ -11,4 +11,5 @@ sentencepiece
 pillow
 
 # please follow https://pytorch.org/ to install PyTorch for your OS
-torch >= 1.13.1
+torch>=2.10.0
+wheel>=0.46.2 # not directly required, pinned by Snyk to avoid a vulnerability
